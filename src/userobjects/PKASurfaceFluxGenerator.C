@@ -38,7 +38,8 @@ PKASurfaceFluxGenerator::PKASurfaceFluxGenerator(const InputParameters & paramet
     _direction(getParam<RealVectorValue>("direction")),
     _flux(getParam<Real>("flux")),
     _dt(getParam<Real>("dt")),
-    _mesh(getMesh("mesh")),
+    _mesh(
+        _app.getMeshGeneratorSystem().getSavedMesh(getParam<MeshGeneratorName>("saved_mesh_name"))),
     _boundary(getParam<BoundaryName>("boundary")),
     _boundary_surface_area(PKASurfaceFluxGenerator::boundarySurfaceArea(_boundary, _mesh)),
     _Z(getParam<Real>("Z")),
@@ -182,4 +183,15 @@ PKASurfaceFluxGenerator::volumeWeightedElemDist(const BoundaryName & boundary,
               "Element probabilities are not normalized to sum to 1.0!");
 
   return prob_elem_pairs;
+}
+
+void
+PKASurfaceFluxGenerator::updateCachedElementID()
+{
+  // get element containing the point
+  mooseAssert(_pl != nullptr, "initialize() must be called on the MooseMyTRIMSample object.");
+  const Elem * elem = (*_pl)(_point);
+  if (elem == nullptr)
+    mooseError("Point ", _point, " is not within the domain.");
+  _elem_id = elem->id();
 }

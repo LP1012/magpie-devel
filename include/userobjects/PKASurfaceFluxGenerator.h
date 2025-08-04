@@ -41,7 +41,7 @@ protected:
   const Real _dt;
 
   /// Mesh that comes from another generator
-  const MeshBase * _mesh;
+  const std::unique_ptr<MeshBase> _mesh;
 
   /// boundary name
   const BoundaryName _boundary;
